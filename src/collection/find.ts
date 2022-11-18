@@ -1,8 +1,8 @@
-import { InitCollection, FindOne } from '../types';
+import { InitCollection, Find } from '../types';
 import { generateDataApiUrl } from '../utilities';
 
-interface _FindOne extends InitCollection, FindOne {}
-const findOne = async ({
+interface _Find extends InitCollection, Find {}
+const find = async ({
     appId,
     apiKey,
     databaseName,
@@ -10,14 +10,20 @@ const findOne = async ({
     collectionName,
     filter = {},
     projection = {},
-}: _FindOne) => {
-    const url = `${generateDataApiUrl(appId)}/action/findOne`;
+    sort = {},
+    limit = 1000,
+    skip = 0,
+}: _Find) => {
+    const url = `${generateDataApiUrl(appId)}/action/find`;
     const requestPayload = {
         collection: collectionName,
         database: databaseName,
         dataSource,
         filter,
         projection,
+        sort,
+        limit,
+        skip,
     };
     try {
         const response = await fetch(url, {
@@ -35,4 +41,4 @@ const findOne = async ({
     }
 };
 
-export default findOne;
+export default find;

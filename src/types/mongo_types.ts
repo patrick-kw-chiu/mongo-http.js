@@ -1,19 +1,32 @@
 // Copy from https://github.com/mongodb/node-mongodb-native/blob/b67af3cd8b094218ec323b23e9950151cb91f1ef/src/mongo_types.ts
 
-import type { Binary, Document, ObjectId, BSONRegExp, Timestamp, Decimal128, Double, Int32, Long } from 'bson';
+import type {
+    ObjectIdLike,
+    Binary,
+    Document,
+    ObjectId,
+    BSONRegExp,
+    Timestamp,
+    Decimal128,
+    Double,
+    Int32,
+    Long,
+} from 'bson';
 import type { Sort } from './sort';
 
 /** @internal */
 export type TODO_NODE_3286 = any;
 
 /** Given an object shaped type, return the type of the _id field or default to ObjectId @public */
-export type InferIdType<TSchema> = TSchema extends { _id: infer IdType } // user has defined a type for _id
-    ? // eslint-disable-next-line @typescript-eslint/ban-types
-      {} extends IdType // TODO(NODE-3285): Improve type readability
-        ? // eslint-disable-next-line @typescript-eslint/ban-types
-          Exclude<IdType, {}>
-        : unknown extends IdType
-        ? ObjectId
+export type InferIdType<TSchema> = TSchema extends { _id: infer IdType }
+    ? // user has defined a type for _id
+      Record<any, never> extends IdType
+        ? never // explicitly forbid empty objects as the type of _id
+        : IdType
+    : TSchema extends { _id?: infer IdType }
+    ? // optional _id defined - return ObjectId | IdType
+      unknown extends IdType
+        ? ObjectId // infer the _id type as ObjectId if the type of _id is unknown
         : IdType
     : ObjectId; // user has not defined _id on schema
 
@@ -23,15 +36,21 @@ export type WithId<TSchema> = EnhancedOmit<TSchema, '_id'> & { _id: InferIdType<
 /**
  * Add an optional _id field to an object shaped type
  * @public
+ */
+export type OptionalId<TSchema> = EnhancedOmit<TSchema, '_id'> & { _id?: InferIdType<TSchema> };
+
+/**
+ * Adds an optional _id field to an object shaped type, unless the _id field is required on that type.
+ * In the case _id is required, this method continues to require_id.
+ *
+ * @public
  *
  * @privateRemarks
  * `ObjectId extends TSchema['_id']` is a confusing ordering at first glance. Rather than ask
  * `TSchema['_id'] extends ObjectId` which translated to "Is the _id property ObjectId?"
  * we instead ask "Does ObjectId look like (have the same shape) as the _id?"
  */
-export type OptionalId<TSchema extends { _id?: any }> = ObjectId extends TSchema['_id'] // a Schema with ObjectId _id type or "any" or "indexed type" provided
-    ? EnhancedOmit<TSchema, '_id'> & { _id?: InferIdType<TSchema> } // a Schema provided but _id type is not ObjectId
-    : WithId<TSchema>; // TODO(NODE-3285): Improve type readability
+export type OptionalUnlessRequiredId<TSchema> = TSchema extends { _id: any } ? TSchema : OptionalId<TSchema>;
 
 /** TypeScript Omit (Exclude to be specific) does not work for objects with an "any" indexed type, and breaks discriminated unions @public */
 export type EnhancedOmit<TRecordOrUnion, KeyUnion> = string extends keyof TRecordOrUnion
@@ -44,10 +63,14 @@ export type EnhancedOmit<TRecordOrUnion, KeyUnion> = string extends keyof TRecor
 export type WithoutId<TSchema> = Omit<TSchema, '_id'>;
 
 /** A MongoDB filter can be some portion of the schema or a set of operators @public */
-export type Filter<TSchema> = {
-    [P in keyof TSchema]?: Condition<TSchema[P]>;
-} &
-    RootFilterOperators<TSchema>;
+export type Filter<TSchema> =
+    | Partial<TSchema>
+    | ({
+          [Property in Join<NestedPaths<WithId<TSchema>, []>, '.'>]?: Condition<
+              PropertyType<WithId<TSchema>, Property>
+          >;
+      } &
+          RootFilterOperators<WithId<TSchema>>);
 
 /** @public */
 export type Condition<T> = AlternativeType<T> | FilterOperators<AlternativeType<T>>;
@@ -78,17 +101,26 @@ export interface RootFilterOperators<TSchema> extends Document {
     $comment?: string | Document;
 }
 
+/**
+ * @public
+ * A type that extends Document but forbids anything that "looks like" an object id.
+ */
+export type NonObjectIdLikeDocument = {
+    [key in keyof ObjectIdLike]?: never;
+} &
+    Document;
+
 /** @public */
-export interface FilterOperators<TValue> extends Document {
+export interface FilterOperators<TValue> extends NonObjectIdLikeDocument {
     // Comparison
     $eq?: TValue;
     $gt?: TValue;
     $gte?: TValue;
-    $in?: TValue[];
+    $in?: ReadonlyArray<TValue>;
     $lt?: TValue;
     $lte?: TValue;
     $ne?: TValue;
-    $nin?: TValue[];
+    $nin?: ReadonlyArray<TValue>;
     // Logical
     $not?: TValue extends string ? FilterOperators<TValue> | RegExp : FilterOperators<TValue>;
     // Element
@@ -111,8 +143,8 @@ export interface FilterOperators<TValue> extends Document {
     $nearSphere?: Document;
     $maxDistance?: number;
     // Array
-    $all?: TValue extends ReadonlyArray<any> ? any[] : never;
-    $elemMatch?: TValue extends ReadonlyArray<any> ? Document : never;
+    $all?: ReadonlyArray<any>;
+    $elemMatch?: Document;
     $size?: TValue extends ReadonlyArray<any> ? number : never;
     // Bitwise
     $bitsAllClear?: BitwiseFilter;
@@ -126,7 +158,7 @@ export interface FilterOperators<TValue> extends Document {
 export type BitwiseFilter =
     | number /** numeric bit mask */
     | Binary /** BinData bit mask */
-    | number[]; /** `[ <position1>, <position2>, ... ]` */
+    | ReadonlyArray<number>; /** `[ <position1>, <position2>, ... ]` */
 
 /** @public */
 export const BSONType = Object.freeze({
@@ -158,26 +190,28 @@ export type BSONType = typeof BSONType[keyof typeof BSONType];
 /** @public */
 export type BSONTypeAlias = keyof typeof BSONType;
 
-/** @public */
-export interface ProjectionOperators extends Document {
-    $elemMatch?: Document;
-    $slice?: number | [number, number];
-    $meta?: string;
-    /** @deprecated Since MongoDB 3.2, Use FindCursor#max */
-    $max?: any;
-}
+/**
+ * @public
+ * Projection is flexible to permit the wide array of aggregation operators
+ * @deprecated since v4.1.0: Since projections support all aggregation operations we have no plans to narrow this type further
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export type Projection<TSchema extends Document = Document> = Document;
 
-/** @public */
-export type Projection<TSchema> = {
-    [Key in keyof TSchema]?: ProjectionOperators | 0 | 1 | boolean;
-} &
-    Partial<Record<string, ProjectionOperators | 0 | 1 | boolean>>;
+/**
+ * @public
+ * @deprecated since v4.1.0: Since projections support all aggregation operations we have no plans to narrow this type further
+ */
+export type ProjectionOperators = Document;
 
 /** @public */
 export type IsAny<Type, ResultIfAny, ResultIfNotAny> = true extends false & Type ? ResultIfAny : ResultIfNotAny;
 
 /** @public */
 export type Flatten<Type> = Type extends ReadonlyArray<infer Item> ? Item : Type;
+
+/** @public */
+export type ArrayElement<Type> = Type extends ReadonlyArray<infer Item> ? Item : never;
 
 /** @public */
 export type SchemaMember<T, V> = { [P in keyof T]?: V } | { [key: string]: V };
@@ -223,7 +257,20 @@ export type OnlyFieldsOfType<TSchema, FieldType = any, AssignableType = FieldTyp
 >;
 
 /** @public */
-export type MatchKeysAndValues<TSchema> = Readonly<Partial<TSchema>> & Record<string, any>;
+export type MatchKeysAndValues<TSchema> = Readonly<
+    {
+        [Property in Join<NestedPaths<TSchema, []>, '.'>]?: PropertyType<TSchema, Property>;
+    } &
+        {
+            [Property in `${NestedPathsOfType<TSchema, any[]>}.$${`[${string}]` | ''}`]?: ArrayElement<
+                PropertyType<TSchema, Property extends `${infer Key}.$${string}` ? Key : never>
+            >;
+        } &
+        {
+            [Property in `${NestedPathsOfType<TSchema, Record<string, any>[]>}.$${`[${string}]` | ''}.${string}`]?: any; // Could be further narrowed
+        } &
+        Document
+>;
 
 /** @public */
 export type AddToSetOperators<Type> = {
@@ -273,7 +320,7 @@ export type PullAllOperator<TSchema> = ({
     readonly [key in KeysOfAType<TSchema, ReadonlyArray<any>>]?: TSchema[key];
 } &
     NotAcceptedFields<TSchema, ReadonlyArray<any>>) & {
-    readonly [key: string]: any[];
+    readonly [key: string]: ReadonlyArray<any>;
 };
 
 /** @public */
@@ -298,3 +345,105 @@ export type UpdateFilter<TSchema> = {
         { and: IntegerType } | { or: IntegerType } | { xor: IntegerType }
     >;
 } & Document;
+
+/** @public */
+export type Nullable<AnyType> = AnyType | null | undefined;
+
+/** @public */
+export type OneOrMore<T> = T | ReadonlyArray<T>;
+
+/**
+ * Helper types for dot-notation filter attributes
+ */
+
+/** @public */
+export type Join<T extends unknown[], D extends string> = T extends []
+    ? ''
+    : T extends [string | number]
+    ? `${T[0]}`
+    : T extends [string | number, ...infer R]
+    ? `${T[0]}${D}${Join<R, D>}`
+    : string;
+
+/** @public */
+export type PropertyType<Type, Property extends string> = string extends Property
+    ? unknown
+    : Property extends keyof Type
+    ? Type[Property]
+    : Property extends `${number}`
+    ? Type extends ReadonlyArray<infer ArrayType>
+        ? ArrayType
+        : unknown
+    : Property extends `${infer Key}.${infer Rest}`
+    ? Key extends `${number}`
+        ? Type extends ReadonlyArray<infer ArrayType>
+            ? PropertyType<ArrayType, Rest>
+            : unknown
+        : Key extends keyof Type
+        ? Type[Key] extends Map<string, infer MapType>
+            ? MapType
+            : PropertyType<Type[Key], Rest>
+        : unknown
+    : unknown;
+
+/**
+ * @public
+ * returns tuple of strings (keys to be joined on '.') that represent every path into a schema
+ * https://docs.mongodb.com/manual/tutorial/query-embedded-documents/
+ *
+ * @remarks
+ * Through testing we determined that a depth of 8 is safe for the typescript compiler
+ * and provides reasonable compilation times. This number is otherwise not special and
+ * should be changed if issues are found with this level of checking. Beyond this
+ * depth any helpers that make use of NestedPaths should devolve to not asserting any
+ * type safety on the input.
+ */
+export type NestedPaths<Type, Depth extends number[]> = Depth['length'] extends 8
+    ? []
+    : Type extends
+          | string
+          | number
+          | boolean
+          | Date
+          | RegExp
+          | Buffer
+          | Uint8Array
+          | ((...args: any[]) => any)
+          | { _bsontype: string }
+    ? []
+    : Type extends ReadonlyArray<infer ArrayType>
+    ? [] | [number, ...NestedPaths<ArrayType, [...Depth, 1]>]
+    : Type extends Map<string, any>
+    ? [string]
+    : Type extends object
+    ? {
+          [Key in Extract<keyof Type, string>]: Type[Key] extends Type // type of value extends the parent
+              ? [Key]
+              : // for a recursive union type, the child will never extend the parent type.
+              // but the parent will still extend the child
+              Type extends Type[Key]
+              ? [Key]
+              : Type[Key] extends ReadonlyArray<infer ArrayType> // handling recursive types with arrays
+              ? Type extends ArrayType // is the type of the parent the same as the type of the array?
+                  ? [Key] // yes, it's a recursive array type
+                  : // for unions, the child type extends the parent
+                  ArrayType extends Type
+                  ? [Key] // we have a recursive array union
+                  : // child is an array, but it's not a recursive array
+                    [Key, ...NestedPaths<Type[Key], [...Depth, 1]>]
+              : // child is not structured the same as the parent
+                [Key, ...NestedPaths<Type[Key], [...Depth, 1]>] | [Key];
+      }[Extract<keyof Type, string>]
+    : [];
+
+/**
+ * @public
+ * returns keys (strings) for every path into a schema with a value of type
+ * https://docs.mongodb.com/manual/tutorial/query-embedded-documents/
+ */
+export type NestedPathsOfType<TSchema, Type> = KeysOfAType<
+    {
+        [Property in Join<NestedPaths<TSchema, []>, '.'>]: PropertyType<TSchema, Property>;
+    },
+    Type
+>;

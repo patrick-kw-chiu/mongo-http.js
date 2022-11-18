@@ -1,5 +1,5 @@
 import { Filter, Projection } from './mongo_types';
-
+import { Sort } from './sort';
 export interface InitClient {
     appId: string;
     apiKey: string;
@@ -20,6 +20,14 @@ export interface Database {
 }
 
 export interface FindOne {
-    filter: Filter<any>;
-    projection: Projection<any>;
+    filter?: Filter<any>;
+    projection?: Projection<any>;
+}
+
+export interface Find {
+    filter?: Filter<any>;
+    projection?: Projection<any>;
+    sort?: Sort;
+    limit?: number;
+    skip?: number;
 }
