@@ -29,9 +29,12 @@ const findOne = async ({
             body: JSON.stringify(requestPayload),
         });
         const responseBody = await response.json();
-        return responseBody;
+        if (responseBody.error) {
+            return { error: responseBody.error, isSuccess: false };
+        }
+        return { ...responseBody, error: null, isSuccess: true };
     } catch (error) {
-        return error;
+        return { error, isSuccess: false };
     }
 };
 

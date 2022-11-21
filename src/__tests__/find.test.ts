@@ -10,8 +10,7 @@ it('find', async () => {
     try {
         const result = await db.collection('articles').find({
             filter: {
-                userId: '8d55e74d4410',
-                categories: { $in: ['javascript'] },
+                $or: [{ creator: 'Patrick Chiu' }, { categories: { $in: ['javascript'] } }],
             },
             projection: {
                 _id: 1,
@@ -23,8 +22,9 @@ it('find', async () => {
             },
         });
 
-        const { documents } = result;
+        const { isSuccess, documents } = result;
         console.log({ documents });
+        expect(isSuccess).toBe(true);
         // expect(document.creator).toBe('Patrick Chiu');
         // expect(document.title).toBe('Migrating a Node.js App to Cloudflare Workers From Heroku');
         // expect(document.guid).toBe('https://medium.com/p/62c679552af');

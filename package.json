@@ -1,6 +1,6 @@
 {
     "name": "mongo-http",
-    "version": "0.0.7",
+    "version": "0.0.9",
     "description": "",
     "main": "./lib/index.js",
     "scripts": {
