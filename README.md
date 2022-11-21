@@ -113,7 +113,7 @@ const result = await articlesCollection.find({});
 #### Example
 
 ```javascript
-const { isSuccess, document, error } = await db.collection('articles').find({
+const { isSuccess, document, error } = await db.collection('articles').findOne({
     filter: {
         $or: [{ creator: 'Patrick Chiu' }, { title: 'Migrating a Node.js App to Cloudflare Workers From Heroku' }],
     },
