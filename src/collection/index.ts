@@ -1,7 +1,8 @@
-import { InitCollection, FindOne, Find } from '../types';
+import { InitCollection, FindOne, Find, Document } from '../types';
 
 import findOne from './findOne';
 import find from './find';
+import insertOne from './insertOne';
 
 const initCollection = ({ appId, apiKey, databaseName, dataSource, collectionName }: InitCollection) => {
     const collectionConfig = { appId, apiKey, databaseName, dataSource, collectionName };
@@ -20,6 +21,12 @@ const initCollection = ({ appId, apiKey, databaseName, dataSource, collectionNam
                 sort,
                 limit,
                 skip,
+            }),
+
+        insertOne: async (document: Document) =>
+            await insertOne({
+                ...collectionConfig,
+                document,
             }),
     };
     return collection;

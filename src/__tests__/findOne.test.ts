@@ -23,24 +23,20 @@ describe('findOne', () => {
             databaseName: process.env.databaseName || '',
         });
 
-        try {
-            const result = await db.collection('articles').findOne({
-                filter,
-                projection,
-            });
+        const result = await db.collection('articles').findOne({
+            filter,
+            projection,
+        });
 
-            const { isSuccess, document } = result;
-            expect(isSuccess).toBe(true);
-            expect(document.creator).toBe('Patrick Chiu');
-            expect(document.title).toBe('Migrating a Node.js App to Cloudflare Workers From Heroku');
-            expect(document.guid).toBe('https://medium.com/p/62c679552af');
-            expect(document.categories).toEqual(
-                expect.arrayContaining(['web-development', 'heroku', 'nodejs', 'database', 'javascript'])
-            );
-            expect(document.isoDate).toBe(undefined);
-        } catch (e) {
-            console.log({ e });
-        }
+        const { isSuccess, document } = result;
+        expect(isSuccess).toBe(true);
+        expect(document.creator).toBe('Patrick Chiu');
+        expect(document.title).toBe('Migrating a Node.js App to Cloudflare Workers From Heroku');
+        expect(document.guid).toBe('https://medium.com/p/62c679552af');
+        expect(document.categories).toEqual(
+            expect.arrayContaining(['web-development', 'heroku', 'nodejs', 'database', 'javascript'])
+        );
+        expect(document.isoDate).toBe(undefined);
     });
 
     it('initDatabase', async () => {
@@ -50,24 +46,20 @@ describe('findOne', () => {
             databaseName: process.env.databaseName || '',
         });
 
-        try {
-            const result = await db.collection('articles').findOne({
-                filter,
-                projection,
-            });
+        const result = await db.collection('articles').findOne({
+            filter,
+            projection,
+        });
 
-            const { isSuccess, document } = result;
-            expect(isSuccess).toBe(true);
-            expect(document.creator).toBe('Patrick Chiu');
-            expect(document.title).toBe('Migrating a Node.js App to Cloudflare Workers From Heroku');
-            expect(document.guid).toBe('https://medium.com/p/62c679552af');
-            expect(document.categories).toEqual(
-                expect.arrayContaining(['web-development', 'heroku', 'nodejs', 'database', 'javascript'])
-            );
-            expect(document.isoDate).toBe(undefined);
-        } catch (e) {
-            console.log({ e });
-        }
+        const { isSuccess, document } = result;
+        expect(isSuccess).toBe(true);
+        expect(document.creator).toBe('Patrick Chiu');
+        expect(document.title).toBe('Migrating a Node.js App to Cloudflare Workers From Heroku');
+        expect(document.guid).toBe('https://medium.com/p/62c679552af');
+        expect(document.categories).toEqual(
+            expect.arrayContaining(['web-development', 'heroku', 'nodejs', 'database', 'javascript'])
+        );
+        expect(document.isoDate).toBe(undefined);
     });
 
     it('initCollection', async () => {
@@ -78,24 +70,20 @@ describe('findOne', () => {
             collectionName: 'articles',
         });
 
-        try {
-            const result = await articlesCollection.findOne({
-                filter,
-                projection,
-            });
+        const result = await articlesCollection.findOne({
+            filter,
+            projection,
+        });
 
-            const { isSuccess, document } = result;
-            expect(isSuccess).toBe(true);
-            expect(document.creator).toBe('Patrick Chiu');
-            expect(document.title).toBe('Migrating a Node.js App to Cloudflare Workers From Heroku');
-            expect(document.guid).toBe('https://medium.com/p/62c679552af');
-            expect(document.categories).toEqual(
-                expect.arrayContaining(['web-development', 'heroku', 'nodejs', 'database', 'javascript'])
-            );
-            expect(document.isoDate).toBe(undefined);
-        } catch (e) {
-            console.log({ e });
-        }
+        const { isSuccess, document } = result;
+        expect(isSuccess).toBe(true);
+        expect(document.creator).toBe('Patrick Chiu');
+        expect(document.title).toBe('Migrating a Node.js App to Cloudflare Workers From Heroku');
+        expect(document.guid).toBe('https://medium.com/p/62c679552af');
+        expect(document.categories).toEqual(
+            expect.arrayContaining(['web-development', 'heroku', 'nodejs', 'database', 'javascript'])
+        );
+        expect(document.isoDate).toBe(undefined);
     });
 
     it('incorrect connection information', async () => {
@@ -106,17 +94,13 @@ describe('findOne', () => {
             collectionName: 'articles',
         });
 
-        try {
-            const result = await articlesCollection.findOne({
-                filter,
-                projection,
-            });
+        const result = await articlesCollection.findOne({
+            filter,
+            projection,
+        });
 
-            const { isSuccess } = result;
-            expect(isSuccess).toBe(false);
-        } catch (e) {
-            console.log({ e });
-        }
+        const { isSuccess } = result;
+        expect(isSuccess).toBe(false);
     });
 
     it('incorrect connection information 2', async () => {
@@ -127,16 +111,12 @@ describe('findOne', () => {
             collectionName: 'articles',
         });
 
-        try {
-            const result = await articlesCollection.findOne({
-                filter,
-                projection,
-            });
+        const result = await articlesCollection.findOne({
+            filter,
+            projection,
+        });
 
-            const { isSuccess } = result;
-            expect(isSuccess).toBe(false);
-        } catch (e) {
-            console.log({ e });
-        }
+        const { isSuccess } = result;
+        expect(isSuccess).toBe(false);
     });
 });

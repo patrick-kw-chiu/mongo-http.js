@@ -14,7 +14,7 @@ A thin wrapper on [Mongodb Atlas Data API](https://www.mongodb.com/docs/atlas/ap
 3. [API](#api)
     1. [findOne](#findone-filter-projection-)
     2. [find](#find-filter-projection-sort-limit-skip-)
-    3. insertOne
+    3. [insertOne](#insertonedocument)
     4. insertMany
     5. updateOne
     6. updateMany
@@ -95,6 +95,17 @@ const result = await articlesCollection.find({});
 
 ### .findOne({ filter, projection })
 
+#### Example
+
+```javascript
+const { isSuccess, document, error } = await db.collection('articles').findOne({
+    filter: {
+        $or: [{ creator: 'Patrick Chiu' }, { title: 'Migrating a Node.js App to Cloudflare Workers From Heroku' }],
+    },
+    projection: { title: 1, creator: 1, guid: 1, categories: 1 },
+});
+```
+
 #### Parameter
 
 | Parameter  | Type   | Default Value | Description                                                                                                                                                                                                                                                                                                                                                |
@@ -110,18 +121,21 @@ const result = await articlesCollection.find({});
 | document  | object (when isSuccess is true)           | If a document is matched, an object is returned<br />If not matched, a null is returned |
 | error     | error OR string (when isSuccess is false) | Error information                                                                       |
 
+### .find({ filter, projection, sort, limit, skip })
+
 #### Example
 
 ```javascript
-const { isSuccess, document, error } = await db.collection('articles').findOne({
+const { isSuccess, documents, error } = await db.collection('articles').find({
     filter: {
-        $or: [{ creator: 'Patrick Chiu' }, { title: 'Migrating a Node.js App to Cloudflare Workers From Heroku' }],
+        $or: [{ categories: { $in: ['javascript', 'nodejs'] } }],
     },
     projection: { title: 1, creator: 1, guid: 1, categories: 1 },
+    sort: { createdAt: -1 },
+    limit: 50,
+    skip: 100,
 });
 ```
-
-### .find({ filter, projection, sort, limit, skip })
 
 #### Parameter
 
@@ -141,15 +155,29 @@ const { isSuccess, document, error } = await db.collection('articles').findOne({
 | documents | array of object(s) (when isSuccess is true) | If document(s) are matched, an array of object(s) is returned<br />If no matches, an empty array is returned |
 | error     | error OR string (when isSuccess is false)   | Error information                                                                                            |
 
+### .insertOne(document)
+
 #### Example
 
 ```javascript
-const { isSuccess, documents, error } = await db.collection('articles').find({
-    filter: {
-        $or: [{ categories: { $in: ['javascript', 'nodejs'] } }],
-    },
-    projection: { title: 1, creator: 1, guid: 1, categories: 1 },
+const { isSuccess, documents, error } = await db.collection('tags').insertOne({
+    cachedAt: '2022-11-25T17:44:59.981+00:00',
+    tags: ['startup', 'programming', 'digital-nomad', 'passive-income', 'python'],
 });
 ```
+
+#### Parameter
+
+| Parameter | Type   | Default value | Description                          |
+| --------- | ------ | ------------- | ------------------------------------ |
+| document  | object | {}            | Document to insert to the collection |
+
+#### Return
+
+| Field      | Type                                      | Description                                      |
+| ---------- | ----------------------------------------- | ------------------------------------------------ |
+| isSuccess  | boolean                                   | Whether the database operation successful or not |
+| insertedId | string                                    | ID of the newly inserted document                |
+| error      | error OR string (when isSuccess is false) | Error information                                |
 
 ### WIP!!!

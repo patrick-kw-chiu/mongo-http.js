@@ -31,3 +31,10 @@ export interface Find {
     limit?: number;
     skip?: number;
 }
+
+export interface Document {
+    [key: string]: any;
+}
+export interface InsertOne {
+    document: Document;
+}
