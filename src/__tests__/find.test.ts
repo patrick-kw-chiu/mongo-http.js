@@ -22,7 +22,6 @@ it('find', async () => {
     });
 
     const { isSuccess, documents } = result;
-    console.log({ documents });
     expect(isSuccess).toBe(true);
     // expect(document.creator).toBe('Patrick Chiu');
     // expect(document.title).toBe('Migrating a Node.js App to Cloudflare Workers From Heroku');

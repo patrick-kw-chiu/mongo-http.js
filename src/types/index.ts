@@ -1,4 +1,6 @@
-import { Filter, Projection } from './mongo_types';
+import { Document } from 'bson';
+import { Filter, Projection, UpdateFilter } from './mongo_types';
+
 import { Sort } from './sort';
 export interface InitClient {
     appId: string;
@@ -32,9 +34,12 @@ export interface Find {
     skip?: number;
 }
 
-export interface Document {
-    [key: string]: any;
-}
 export interface InsertOne {
     document: Document;
+}
+
+export interface UpdateOne {
+    filter: Filter<any>;
+    update: UpdateFilter<any>;
+    upsert?: boolean;
 }

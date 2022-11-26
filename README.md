@@ -16,7 +16,7 @@ A thin wrapper on [Mongodb Atlas Data API](https://www.mongodb.com/docs/atlas/ap
     2. [find](#find-filter-projection-sort-limit-skip-)
     3. [insertOne](#insertonedocument)
     4. insertMany
-    5. updateOne
+    5. [updateOne](#updateone-filter-update-upsert-)
     6. updateMany
     7. replaceOne
     8. deleteOne
@@ -179,5 +179,40 @@ const { isSuccess, documents, error } = await db.collection('tags').insertOne({
 | isSuccess  | boolean                                   | Whether the database operation successful or not |
 | insertedId | string                                    | ID of the newly inserted document                |
 | error      | error OR string (when isSuccess is false) | Error information                                |
+
+### .updateOne({ filter, update, upsert })
+
+#### Example
+
+```javascript
+const { isSuccess, documents, error } = await db.collection('tags').updateOne({
+    filter: {
+        _id: { $oid: '638199c045955b5e9701be1f' },
+    },
+    update: {
+        date: '2022-11-25T00:00:00.000+00:00',
+        tags: ['startup', 'programming', 'digital-nomad', 'passive-income', 'python', 'something-else'],
+    },
+    upsert: true,
+});
+```
+
+#### Parameter
+
+| Parameter | Type    | Default value | Description                                                                                                                                                                                                                                                                                                                                                |
+| --------- | ------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| filter    | object  | {}            | Query object to filter the document from the collection<br />Same syntax with [MongoDB driver filter](https://www.mongodb.com/docs/drivers/node/current/fundamentals/crud/query-document/#std-label-node-fundamentals-query-document) and [Data API](https://www.mongodb.com/docs/atlas/app-services/data-api/generated-endpoints/#find-a-single-document) |
+| update    | object  | {}            | A [MongoDB Update Expression](https://www.mongodb.com/docs/manual/tutorial/update-documents/) that specifies how to modify the matched document                                                                                                                                                                                                            |
+| upsert    | boolean | false         | The `upsert` flag only applies if no documents match the specified `filter`. If `true`, the updateOne action inserts a new document that matches the filter with the specified `update` applied to it.                                                                                                                                                     |
+
+#### Return
+
+| Field         | Type                                      | Description                                        |
+| ------------- | ----------------------------------------- | -------------------------------------------------- |
+| isSuccess     | boolean                                   | Whether the database operation successful or not   |
+| matchedCount  | number                                    | The number of documents that the filter matched    |
+| modifiedCount | number                                    | The number of matching documents that were updated |
+| upsertId      | string                                    | ID of the newly inserted document                  |
+| error         | error OR string (when isSuccess is false) | Error information                                  |
 
 ### WIP!!!

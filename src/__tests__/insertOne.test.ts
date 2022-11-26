@@ -1,4 +1,4 @@
-import { initClient, initDatabase, initCollection } from '../index';
+import { initDatabase } from '../index';
 
 describe('insertOne', () => {
     it('initDatabase', async () => {
@@ -9,7 +9,7 @@ describe('insertOne', () => {
         });
 
         const result = await db.collection('hotTags').insertOne({
-            cachedAt: '2022-11-25T17:44:59.981+00:00',
+            date: '2022-11-25T00:00:00.000+00:00',
             tags: ['startup', 'programming', 'digital-nomad', 'passive-income', 'python'],
         });
 

@@ -1,6 +1,6 @@
 {
     "name": "mongo-http",
-    "version": "0.0.9",
+    "version": "0.0.11",
     "description": "",
     "main": "./lib/index.js",
     "scripts": {
@@ -14,7 +14,16 @@
     "files": [
         "lib/**/*"
     ],
-    "keywords": [],
+    "keywords": [
+        "mongo",
+        "mongodb",
+        "http",
+        "async",
+        "serverless",
+        "cloudflare workers",
+        "deno",
+        "typescript"
+    ],
     "author": "",
     "license": "ISC",
     "bugs": {
