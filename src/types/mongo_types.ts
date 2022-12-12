@@ -1,4 +1,4 @@
-// Copy from https://github.com/mongodb/node-mongodb-native/blob/b67af3cd8b094218ec323b23e9950151cb91f1ef/src/mongo_types.ts
+// Copy from https://github.com/mongodb/node-mongodb-native/blob/main/src/mongo_types.ts
 
 import type {
     ObjectIdLike,

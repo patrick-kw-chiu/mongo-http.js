@@ -1,10 +1,11 @@
 import { Document } from 'bson';
-import { InitCollection, FindOne, Find, UpdateOne } from '../types';
+import { InitCollection, FindOne, Find, UpdateOne, Aggregate } from '../types';
 
 import findOne from './findOne';
 import find from './find';
 import insertOne from './insertOne';
 import updateOne from './updateOne';
+import aggregate from './aggregate';
 
 const initCollection = ({ appId, apiKey, databaseName, dataSource, collectionName }: InitCollection) => {
     const collectionConfig = { appId, apiKey, databaseName, dataSource, collectionName };
@@ -38,6 +39,8 @@ const initCollection = ({ appId, apiKey, databaseName, dataSource, collectionNam
                 update,
                 upsert,
             }),
+
+        aggregate: async ({ pipeline }: Aggregate) => await aggregate({ ...collectionConfig, pipeline }),
     };
     return collection;
 };

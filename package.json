@@ -1,11 +1,12 @@
 {
     "name": "mongo-http",
-    "version": "0.0.11",
+    "version": "0.0.13",
     "description": "",
     "main": "./lib/index.js",
     "scripts": {
         "test": "jest --config jest.config.js",
-        "build": "tsc"
+        "build": "tsc",
+        "prepare": "npm run build"
     },
     "repository": {
         "type": "git",

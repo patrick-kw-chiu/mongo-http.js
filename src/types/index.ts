@@ -43,3 +43,8 @@ export interface UpdateOne {
     update: UpdateFilter<any>;
     upsert?: boolean;
 }
+
+// https://github.com/mongodb/node-mongodb-native/blob/main/src/operations/aggregate.ts
+export interface Aggregate {
+    pipeline: Document[];
+}

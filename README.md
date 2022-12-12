@@ -21,7 +21,7 @@ A thin wrapper on [Mongodb Atlas Data API](https://www.mongodb.com/docs/atlas/ap
     7. replaceOne
     8. deleteOne
     9. deleteMany
-    10. aggregate
+    10. [aggregate](#aggregate-pipeline-)
 
 ## Setup
 
@@ -160,7 +160,7 @@ const { isSuccess, documents, error } = await db.collection('articles').find({
 #### Example
 
 ```javascript
-const { isSuccess, documents, error } = await db.collection('tags').insertOne({
+const { isSuccess, matchedCount, modifiedCount, upsertId, error } = await db.collection('tags').insertOne({
     cachedAt: '2022-11-25T17:44:59.981+00:00',
     tags: ['startup', 'programming', 'digital-nomad', 'passive-income', 'python'],
 });
@@ -185,7 +185,7 @@ const { isSuccess, documents, error } = await db.collection('tags').insertOne({
 #### Example
 
 ```javascript
-const { isSuccess, documents, error } = await db.collection('tags').updateOne({
+const { isSuccess, matchedCount, modifiedCount, upsertId, error } = await db.collection('tags').updateOne({
     filter: {
         _id: { $oid: '638199c045955b5e9701be1f' },
     },
@@ -214,5 +214,40 @@ const { isSuccess, documents, error } = await db.collection('tags').updateOne({
 | modifiedCount | number                                    | The number of matching documents that were updated |
 | upsertId      | string                                    | ID of the newly inserted document                  |
 | error         | error OR string (when isSuccess is false) | Error information                                  |
+
+### .aggregate({ pipeline })
+
+#### Example
+
+```javascript
+const { isSuccess, documents, error } = await db.collection('users').aggregate({
+    pipeline: [
+        { $match: { userId: 'f95cfc82f512' } },
+        {
+            $lookup: {
+                from: 'notifications',
+                localField: 'userId',
+                foreignField: 'userId2',
+                as: 'notification',
+            },
+        },
+        { $unwind: '$notification' },
+    ],
+});
+```
+
+#### Parameter
+
+| Parameter | Type             | Default value | Description                                                                                       |
+| --------- | ---------------- | ------------- | ------------------------------------------------------------------------------------------------- |
+| pipeline  | array of objects | []            | A [MongoDB Aggregation Pipeline](https://www.mongodb.com/docs/manual/core/aggregation-pipeline/). |
+
+#### Return
+
+| Field     | Type                                        | Description                                                                                                  |
+| --------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| isSuccess | boolean                                     | Whether the database operation successful or not                                                             |
+| documents | array of object(s) (when isSuccess is true) | If document(s) are matched, an array of object(s) is returned<br />If no matches, an empty array is returned |
+| error     | error OR string (when isSuccess is false)   | Error information                                                                                            |
 
 ### WIP!!!
