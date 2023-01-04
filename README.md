@@ -18,9 +18,9 @@ A thin wrapper on [Mongodb Atlas Data API](https://www.mongodb.com/docs/atlas/ap
     4. [insertMany](#insertmanydocuments)
     5. [updateOne](#updateone-filter-update-upsert-)
     6. [updateMany](#updatemany-filter-update-upsert-)
-    7. replaceOne
-    8. deleteOne
-    9. deleteMany
+    7. [replaceOne](#replaceone-filter-replacement-upsert-)
+    8. [deleteOne](#deleteone-filter-)
+    9. [deleteMany](#deletemany-filter-)
     10. [aggregate](#aggregate-pipeline-)
 
 ## Setup
@@ -280,6 +280,93 @@ const { isSuccess, matchedCount, modifiedCount, upsertedId, error } = await db.c
 | upsertedId    | string       | ID of the newly inserted document                  |
 | error         | error / null | Error information                                  |
 
+### .replaceOne({ filter, replacement, upsert })
+
+#### Example
+
+```javascript
+const { isSuccess, matchedCount, modifiedCount, upsertedId, error } = await db.collection('tags').replaceOne({
+    filter: {
+        _id: { $oid: '638199c045955b5e9701be1f' },
+    },
+    replacement: {
+        date: '2022-11-25T00:00:00.000+00:00',
+        tags: ['startup', 'programming', 'digital-nomad', 'passive-income', 'python', 'something-else'],
+    },
+    upsert: true,
+});
+```
+
+#### Parameter
+
+| Parameter   | Type    | Default value | Description                                                                                                                                                                                |
+| ----------- | ------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| filter      | object  | {}            | A [MongoDB Query Filter](https://www.mongodb.com/docs/manual/tutorial/query-documents/). The `replaceOne` action overwrites the first document in the collection that matches this filter. |
+| replacement | object  | {}            | An [EJSON](https://www.mongodb.com/docs/manualreference/mongodb-extended-json/) document that overwrites the matched document.                                                             |
+| upsert      | boolean | false         | The `upsert` flag only applies if no documents match the specified `filter`. If `true`, the `replaceOne` action inserts the `replacement` document.                                        |
+
+#### Return
+
+| Field         | Type         | Description                                        |
+| ------------- | ------------ | -------------------------------------------------- |
+| isSuccess     | boolean      | Whether the database operation successful or not   |
+| matchedCount  | number       | The number of documents that the filter matched    |
+| modifiedCount | number       | The number of matching documents that were updated |
+| upsertedId    | string       | ID of the newly inserted document                  |
+| error         | error / null | Error information                                  |
+
+### .deleteOne({ filter })
+
+#### Example
+
+```javascript
+const { isSuccess, deletedCount, error } = await db.collection('tags').deleteOne({
+    filter: {
+        date: '2022-12-01T00:00:00.000+00:00',
+    },
+});
+```
+
+#### Parameter
+
+| Parameter | Type   | Default value | Description                                                                                                                                                                            |
+| --------- | ------ | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| filter    | object | {}            | A [MongoDB Query Filter](https://www.mongodb.com/docs/manual/tutorial/query-documents/). The `deleteOne` action deletes the first document in the collection that matches this filter. |
+
+#### Return
+
+| Field        | Type         | Description                                      |
+| ------------ | ------------ | ------------------------------------------------ |
+| isSuccess    | boolean      | Whether the database operation successful or not |
+| deletedCount | number       | The number of deleted documents                  |
+| error        | error / null | Error information                                |
+
+### .deleteMany({ filter })
+
+#### Example
+
+```javascript
+const { isSuccess, deletedCount, error } = await db.collection('tags').deleteMany({
+    filter: {
+        date: { $gte: '2022-12-01' },
+    },
+});
+```
+
+#### Parameter
+
+| Parameter | Type   | Default value | Description                                                                                                                                                                      |
+| --------- | ------ | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| filter    | object | {}            | A [MongoDB Query Filter](https://www.mongodb.com/docs/manual/tutorial/query-documents/). The `deleteMany` action deletes all documents in the collection that match this filter. |
+
+#### Return
+
+| Field        | Type         | Description                                      |
+| ------------ | ------------ | ------------------------------------------------ |
+| isSuccess    | boolean      | Whether the database operation successful or not |
+| deletedCount | number       | The number of deleted documents                  |
+| error        | error / null | Error information                                |
+
 ### .aggregate({ pipeline })
 
 #### Example
@@ -314,5 +401,3 @@ const { isSuccess, documents, error } = await db.collection('users').aggregate({
 | isSuccess | boolean                          | Whether the database operation successful or not                                                             |
 | documents | array of object(s) / empty array | If document(s) are matched, an array of object(s) is returned<br />If no matches, an empty array is returned |
 | error     | error / null                     | Error information                                                                                            |
-
-### WIP!!!

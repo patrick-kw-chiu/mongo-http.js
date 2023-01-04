@@ -54,6 +54,20 @@ export interface UpdateMany {
     upsert?: boolean;
 }
 
+export interface ReplaceOne {
+    filter: Filter<any>;
+    replacement: Document;
+    upsert?: boolean;
+}
+
+export interface DeleteOne {
+    filter: Filter<any>;
+}
+
+export interface DeleteMany {
+    filter: Filter<any>;
+}
+
 // https://github.com/mongodb/node-mongodb-native/blob/main/src/operations/aggregate.ts
 export interface Aggregate {
     pipeline: Document[];

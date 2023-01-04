@@ -1,6 +1,6 @@
 import { initDatabase } from '../index';
 
-describe('updateOne', () => {
+describe('replaceOne', () => {
     it('initDatabase', async () => {
         const db = initDatabase({
             appId: process.env.analyticsAppId || '',
@@ -8,11 +8,11 @@ describe('updateOne', () => {
             databaseName: process.env.analyticsDatabaseName || '',
         });
 
-        const result = await db.collection('hotTags').updateOne({
+        const result = await db.collection('hotTags').replaceOne({
             filter: {
                 _id: { $oid: '63b4bc7d26d5de2f4762158f' },
             },
-            update: {
+            replacement: {
                 date: '2022-11-25T00:00:00.000+00:00',
                 tags: ['startup', 'programming', 'digital-nomad', 'passive-income', 'python', 'something-else'],
             },
