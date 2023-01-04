@@ -2,7 +2,7 @@
 
 ## About
 
-A thin wrapper on [Mongodb Atlas Data API](https://www.mongodb.com/docs/atlas/api/data-api/) using native [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) API. This library serves the usecase where TCP connections over Mongodb Atlas is not possible (e.g. Serverless functions like Cloudflare Workers and Deno), while still wanting to use similar MongoDB driver syntax.
+A thin wrapper on [Mongodb Atlas Data API](https://www.mongodb.com/docs/atlas/api/data-api/) using native [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) API. This library serves the usecase where TCP connections over Mongodb Atlas is not possible (e.g. from browser and Serverless functions like Cloudflare Workers and Deno), while still wanting to use similar MongoDB driver syntax.
 
 ## Table of Contents
 
@@ -15,9 +15,9 @@ A thin wrapper on [Mongodb Atlas Data API](https://www.mongodb.com/docs/atlas/ap
     1. [findOne](#findone-filter-projection-)
     2. [find](#find-filter-projection-sort-limit-skip-)
     3. [insertOne](#insertonedocument)
-    4. insertMany
+    4. [insertMany](#insertmanydocuments)
     5. [updateOne](#updateone-filter-update-upsert-)
-    6. updateMany
+    6. [updateMany](#updatemany-filter-update-upsert-)
     7. replaceOne
     8. deleteOne
     9. deleteMany
@@ -108,18 +108,18 @@ const { isSuccess, document, error } = await db.collection('articles').findOne({
 
 #### Parameter
 
-| Parameter  | Type   | Default Value | Description                                                                                                                                                                                                                                                                                                                                                |
-| ---------- | ------ | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| filter     | object | {}            | Object filter to query the document from the collection<br />Same syntax with [MongoDB driver filter](https://www.mongodb.com/docs/drivers/node/current/fundamentals/crud/query-document/#std-label-node-fundamentals-query-document) and [Data API](https://www.mongodb.com/docs/atlas/app-services/data-api/generated-endpoints/#find-a-single-document) |
-| projection | object | {}            | Object to project which fields to return<br />Same syntax with [MongoDB driver projection](https://www.mongodb.com/docs/manual/tutorial/project-fields-from-query-results/)                                                                                                                                                                                |
+| Parameter  | Type   | Default Value | Description                                                                                                                                                                                                                                                                    |
+| ---------- | ------ | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| filter     | object | {}            | A [MongoDB Query Filter](https://www.mongodb.com/docs/manual/tutorial/query-documents/). The `findOne` action returns the first document in the collection that matches this filter.<br />If you do not specify a `filter`, the action matches all document in the collection. |
+| projection | object | {}            | A [MongoDB Query Projection](https://www.mongodb.com/docs/manual/tutorial/project-fields-from-query-results/). Depending on the projection, the returned document will either omit specific fields or include only specified fields or values)                                 |
 
 #### Return
 
-| Field     | Type                                      | Description                                                                             |
-| --------- | ----------------------------------------- | --------------------------------------------------------------------------------------- |
-| isSuccess | boolean                                   | Whether the database operation successful or not                                        |
-| document  | object (when isSuccess is true)           | If a document is matched, an object is returned<br />If not matched, a null is returned |
-| error     | error OR string (when isSuccess is false) | Error information                                                                       |
+| Field     | Type          | Description                                                                             |
+| --------- | ------------- | --------------------------------------------------------------------------------------- |
+| isSuccess | boolean       | Whether the database operation successful or not                                        |
+| document  | object / null | If a document is matched, an object is returned<br />If not matched, a null is returned |
+| error     | error / null  | Error information                                                                       |
 
 ### .find({ filter, projection, sort, limit, skip })
 
@@ -139,28 +139,28 @@ const { isSuccess, documents, error } = await db.collection('articles').find({
 
 #### Parameter
 
-| Parameter  | Type   | Default value | Description                                                                                                                                                                                                                                                                                                                                                |
-| ---------- | ------ | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| filter     | object | {}            | Query object to filter the document from the collection<br />Same syntax with [MongoDB driver filter](https://www.mongodb.com/docs/drivers/node/current/fundamentals/crud/query-document/#std-label-node-fundamentals-query-document) and [Data API](https://www.mongodb.com/docs/atlas/app-services/data-api/generated-endpoints/#find-a-single-document) |
-| projection | object | {}            | Projection object to select which fields to return<br />Same syntax with [MongoDB driver projection](https://www.mongodb.com/docs/manual/tutorial/project-fields-from-query-results/)                                                                                                                                                                      |
-| sort       | object | {}            | Sort object to set the ordering<br />Same syntax with [MongoDB driver sort](https://www.mongodb.com/docs/drivers/node/current/fundamentals/crud/read-operations/sort/)                                                                                                                                                                                     |
-| limit      | number | 1000          | At maximum, how many documents are returned                                                                                                                                                                                                                                                                                                                |
-| skip       | number | 0             | How many documents to omit from the beginning of the list of returned documents                                                                                                                                                                                                                                                                            |
+| Parameter  | Type   | Default value | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ---------- | ------ | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| filter     | object | {}            | A [MongoDB Query Filter](https://www.mongodb.com/docs/manual/tutorial/query-documents/). The find action returns documents in the collection that match this filter.<br />If you do not specify a `filter`, the action matches all document in the collection.<br />If the filter matches more documents than the specified `limit`, the action only returns a subset of them. You can use `skip` in subsequent queries to return later documents in the result set. |
+| projection | object | {}            | A [MongoDB Query Projection](https://www.mongodb.com/docs/manual/tutorial/project-fields-from-query-results/). Depending on the projection, the returned document will either omit specific fields or include only specified fields or values)                                                                                                                                                                                                                       |
+| sort       | object | {}            | A [MongoDB Sort Expression](https://www.mongodb.com/docs/manual/reference/operator/aggregation/sort/). Matched documents are returned in ascending or descending order of the fields specified in the expression.                                                                                                                                                                                                                                                    |
+| limit      | number | 1000          | The maximum number of matched documents to include in the returned result set. Each request may return up to 50,000 documents.                                                                                                                                                                                                                                                                                                                                       |
+| skip       | number | 0             | The number of matched documents to skip before adding matched documents to the result set.                                                                                                                                                                                                                                                                                                                                                                           |
 
 #### Return
 
-| Field     | Type                                        | Description                                                                                                  |
-| --------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| isSuccess | boolean                                     | Whether the database operation successful or not                                                             |
-| documents | array of object(s) (when isSuccess is true) | If document(s) are matched, an array of object(s) is returned<br />If no matches, an empty array is returned |
-| error     | error OR string (when isSuccess is false)   | Error information                                                                                            |
+| Field     | Type                             | Description                                                                                                  |
+| --------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| isSuccess | boolean                          | Whether the database operation successful or not                                                             |
+| documents | array of object(s) / empty array | If document(s) are matched, an array of object(s) is returned<br />If no matches, an empty array is returned |
+| error     | error / null                     | Error information                                                                                            |
 
 ### .insertOne(document)
 
 #### Example
 
 ```javascript
-const { isSuccess, matchedCount, modifiedCount, upsertId, error } = await db.collection('tags').insertOne({
+const { isSuccess, insertedId, error } = await db.collection('tags').insertOne({
     cachedAt: '2022-11-25T17:44:59.981+00:00',
     tags: ['startup', 'programming', 'digital-nomad', 'passive-income', 'python'],
 });
@@ -168,24 +168,55 @@ const { isSuccess, matchedCount, modifiedCount, upsertId, error } = await db.col
 
 #### Parameter
 
-| Parameter | Type   | Default value | Description                          |
-| --------- | ------ | ------------- | ------------------------------------ |
-| document  | object | {}            | Document to insert to the collection |
+| Parameter | Type   | Default value | Description                                                                                                             |
+| --------- | ------ | ------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| document  | object | {}            | An [EJSON](https://www.mongodb.com/docs/manualreference/mongodb-extended-json/) document to insert into the collection. |
 
 #### Return
 
-| Field      | Type                                      | Description                                      |
-| ---------- | ----------------------------------------- | ------------------------------------------------ |
-| isSuccess  | boolean                                   | Whether the database operation successful or not |
-| insertedId | string                                    | ID of the newly inserted document                |
-| error      | error OR string (when isSuccess is false) | Error information                                |
+| Field      | Type         | Description                                      |
+| ---------- | ------------ | ------------------------------------------------ |
+| isSuccess  | boolean      | Whether the database operation successful or not |
+| insertedId | string       | ID of the newly inserted document                |
+| error      | error / null | Error information                                |
+
+### .insertMany(documents)
+
+#### Example
+
+```javascript
+const { isSuccess, insertedIds, error } = await db.collection('tags').insertMany([
+    {
+        date: '2022-11-01T00:00:00.000+00:00',
+        tags: ['startup', 'programming', 'digital-nomad', 'passive-income', 'python'],
+    },
+    {
+        date: '2022-12-01T00:00:00.000+00:00',
+        tags: ['goblin-mode', 'new-year', 'economic-crisis'],
+    },
+]);
+```
+
+#### Parameter
+
+| Parameter | Type               | Default value | Description                                                                                                                                   |
+| --------- | ------------------ | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| documents | array of object(s) | []            | An array of one or more [EJSON](https://www.mongodb.com/docs/manualreference/mongodb-extended-json/) documents to insert into the collection. |
+
+#### Return
+
+| Field       | Type               | Description                                                   |
+| ----------- | ------------------ | ------------------------------------------------------------- |
+| isSuccess   | boolean            | Whether the database operation successful or not              |
+| insertedIds | array of string(s) | `_id` values of all inserted documents as an array of strings |
+| error       | error / null       | Error information                                             |
 
 ### .updateOne({ filter, update, upsert })
 
 #### Example
 
 ```javascript
-const { isSuccess, matchedCount, modifiedCount, upsertId, error } = await db.collection('tags').updateOne({
+const { isSuccess, matchedCount, modifiedCount, upsertedId, error } = await db.collection('tags').updateOne({
     filter: {
         _id: { $oid: '638199c045955b5e9701be1f' },
     },
@@ -199,21 +230,55 @@ const { isSuccess, matchedCount, modifiedCount, upsertId, error } = await db.col
 
 #### Parameter
 
-| Parameter | Type    | Default value | Description                                                                                                                                                                                                                                                                                                                                                |
-| --------- | ------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| filter    | object  | {}            | Query object to filter the document from the collection<br />Same syntax with [MongoDB driver filter](https://www.mongodb.com/docs/drivers/node/current/fundamentals/crud/query-document/#std-label-node-fundamentals-query-document) and [Data API](https://www.mongodb.com/docs/atlas/app-services/data-api/generated-endpoints/#find-a-single-document) |
-| update    | object  | {}            | A [MongoDB Update Expression](https://www.mongodb.com/docs/manual/tutorial/update-documents/) that specifies how to modify the matched document                                                                                                                                                                                                            |
-| upsert    | boolean | false         | The `upsert` flag only applies if no documents match the specified `filter`. If `true`, the updateOne action inserts a new document that matches the filter with the specified `update` applied to it.                                                                                                                                                     |
+| Parameter | Type    | Default value | Description                                                                                                                                                                                              |
+| --------- | ------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| filter    | object  | {}            | A [MongoDB Query Filter](https://www.mongodb.com/docs/manual/tutorial/query-documents/). The `updateOne` action modifies the first document in the collection that matches this filter.                  |
+| update    | object  | {}            | A [MongoDB Update Expression](https://www.mongodb.com/docs/manual/tutorial/update-documents/) that specifies how to modify the matched document                                                          |
+| upsert    | boolean | false         | The `upsert` flag only applies if no documents match the specified `filter`. If `true`, the `updateOne` action inserts a new document that matches the filter with the specified `update` applied to it. |
 
 #### Return
 
-| Field         | Type                                      | Description                                        |
-| ------------- | ----------------------------------------- | -------------------------------------------------- |
-| isSuccess     | boolean                                   | Whether the database operation successful or not   |
-| matchedCount  | number                                    | The number of documents that the filter matched    |
-| modifiedCount | number                                    | The number of matching documents that were updated |
-| upsertId      | string                                    | ID of the newly inserted document                  |
-| error         | error OR string (when isSuccess is false) | Error information                                  |
+| Field         | Type         | Description                                        |
+| ------------- | ------------ | -------------------------------------------------- |
+| isSuccess     | boolean      | Whether the database operation successful or not   |
+| matchedCount  | number       | The number of documents that the filter matched    |
+| modifiedCount | number       | The number of matching documents that were updated |
+| upsertedId    | string       | ID of the newly inserted document                  |
+| error         | error / null | Error information                                  |
+
+### .updateMany({ filter, update, upsert })
+
+#### Example
+
+```javascript
+const { isSuccess, matchedCount, modifiedCount, upsertedId, error } = await db.collection('users').updateMany({
+    filter: {
+        lastLoginAt: { $lt: '2023-01-01' },
+    },
+    update: {
+        isActive: false,
+    },
+    upsert: true,
+});
+```
+
+#### Parameter
+
+| Parameter | Type    | Default value | Description                                                                                                                                                                                               |
+| --------- | ------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| filter    | object  | {}            | A [MongoDB Query Filter](https://www.mongodb.com/docs/manual/tutorial/query-documents/). The `updateMany` action modifies all documents in the collection that match this filter.                         |
+| update    | object  | {}            | A [MongoDB Update Expression](https://www.mongodb.com/docs/manual/tutorial/update-documents/) that specifies how to modify matched documents.                                                             |
+| upsert    | boolean | false         | The `upsert` flag only applies if no documents match the specified `filter`. If `true`, the `updateMany` action inserts a new document that matches the filter with the specified `update` applied to it. |
+
+#### Return
+
+| Field         | Type         | Description                                        |
+| ------------- | ------------ | -------------------------------------------------- |
+| isSuccess     | boolean      | Whether the database operation successful or not   |
+| matchedCount  | number       | The number of documents that the filter matched    |
+| modifiedCount | number       | The number of matching documents that were updated |
+| upsertedId    | string       | ID of the newly inserted document                  |
+| error         | error / null | Error information                                  |
 
 ### .aggregate({ pipeline })
 
@@ -244,10 +309,10 @@ const { isSuccess, documents, error } = await db.collection('users').aggregate({
 
 #### Return
 
-| Field     | Type                                        | Description                                                                                                  |
-| --------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| isSuccess | boolean                                     | Whether the database operation successful or not                                                             |
-| documents | array of object(s) (when isSuccess is true) | If document(s) are matched, an array of object(s) is returned<br />If no matches, an empty array is returned |
-| error     | error OR string (when isSuccess is false)   | Error information                                                                                            |
+| Field     | Type                             | Description                                                                                                  |
+| --------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| isSuccess | boolean                          | Whether the database operation successful or not                                                             |
+| documents | array of object(s) / empty array | If document(s) are matched, an array of object(s) is returned<br />If no matches, an empty array is returned |
+| error     | error / null                     | Error information                                                                                            |
 
 ### WIP!!!

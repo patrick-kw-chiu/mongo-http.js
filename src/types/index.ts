@@ -38,7 +38,17 @@ export interface InsertOne {
     document: Document;
 }
 
+export interface InsertMany {
+    documents: Document[];
+}
+
 export interface UpdateOne {
+    filter: Filter<any>;
+    update: UpdateFilter<any>;
+    upsert?: boolean;
+}
+
+export interface UpdateMany {
     filter: Filter<any>;
     update: UpdateFilter<any>;
     upsert?: boolean;
