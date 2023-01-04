@@ -2,7 +2,7 @@
 
 ## About
 
-A thin wrapper on [Mongodb Atlas Data API](https://www.mongodb.com/docs/atlas/api/data-api/) using native [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) API. This library serves the usecase where TCP connections over Mongodb Atlas is not possible (e.g. from browser and Serverless functions like Cloudflare Workers and Deno), while still wanting to use similar MongoDB driver syntax.
+A thin wrapper on [Mongodb Atlas Data API](https://www.mongodb.com/docs/atlas/api/data-api/) using native [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) API. This library serves the usecase where TCP connections over Mongodb Atlas is not possible (e.g. Serverless runtime like Cloudflare Workers and Deno), while still wanting to use similar MongoDB driver syntax.
 
 ## Table of Contents
 
