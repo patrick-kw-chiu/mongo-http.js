@@ -2,11 +2,13 @@
 
 ## About
 
+![mongo-http.js flow](https://github.com/patrick-kw-chiu/mongo-http.js/blob/main/assets/flow.png?raw=true)
+
 A thin wrapper on [Mongodb Atlas Data API](https://www.mongodb.com/docs/atlas/api/data-api/) using native [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) API. This library serves the usecase where
 
 -   TCP connections over Mongodb Atlas is not possible (e.g. Serverless runtime like Cloudflare Workers), while still wanting to use similar MongoDB driver syntax.
--   It can also be used in serverless runtimes which the reuse of a MongoDB connection [may not always be available](https://medium.com/r/?url=https%3A%2F%2Fwww.mongodb.com%2Fdeveloper%2Flanguages%2Fjavascript%2Fdeveloping-web-application-netlify-serverless-functions-mongodb%2F%23conclusion) or [require manual caching](https://medium.com/r/?url=https%3A%2F%2Fwww.mongodb.com%2Fdeveloper%2Flanguages%2Fjavascript%2Fintegrate-mongodb-vercel-functions-serverless-experience%2F%23conclusion)
--   Sadly, it cannot be used in the browser side yet, due to [CORS](https://medium.com/r/?url=https%3A%2F%2Fdeveloper.mozilla.org%2Fen-US%2Fdocs%2FWeb%2FHTTP%2FCORS). Here is a [thread](https://medium.com/r/?url=https%3A%2F%2Ffeedback.mongodb.com%2Fforums%2F945334-atlas-app-services%2Fsuggestions%2F44666878-please-support-cors-from-the-data-api) to request the CORS feature
+-   It can also be used in serverless runtimes which the reuse of a MongoDB connection [may not always be available](https://www.mongodb.com/developer/languages/javascript/developing-web-application-netlify-serverless-functions-mongodb/#conclusion) or [require manual caching](https://www.mongodb.com/developer/languages/javascript/integrate-mongodb-vercel-functions-serverless-experience/#conclusion)
+-   Sadly, it cannot be used in the browser side yet, due to [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS). Here is a [thread](https://feedback.mongodb.com/forums/945334-atlas-app-services/suggestions/44666878-please-support-cors-from-the-data-api) to request the CORS feature
 
 ## Table of Contents
 
