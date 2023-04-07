@@ -1,7 +1,7 @@
 {
     "name": "mongo-http",
-    "version": "0.0.18",
-    "description": "",
+    "version": "0.0.19",
+    "description": "A thin wrapper on Mongodb Atlas Data API using native fetch API",
     "main": "./lib/index.js",
     "scripts": {
         "test": "jest --config jest.config.js",
@@ -25,7 +25,7 @@
         "deno",
         "typescript"
     ],
-    "author": "",
+    "author": "Patrick Chiu",
     "license": "ISC",
     "bugs": {
         "url": "https://github.com/patrick-kw-chiu/mongo-http.js/issues"
