@@ -85,7 +85,7 @@ const result = await db.collection('articles').find({});
 #### ... Or, Initialize a collection
 
 ```javascript
-import { initDatabase } from 'mongo-http';
+import { initCollection } from 'mongo-http';
 
 const articlesCollection = initCollection({
     appId: process.env.appId || '',
