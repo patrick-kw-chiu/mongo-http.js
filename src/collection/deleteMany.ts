@@ -1,16 +1,14 @@
 import { InitCollection, DeleteMany } from '../types';
-import { generateDataApiUrl } from '../utilities';
 
 interface _DeleteMany extends InitCollection, DeleteMany {}
 const deleteMany = async ({
-    appId,
+    appHost,
     apiKey,
     databaseName,
     dataSource = 'Cluster0',
     collectionName,
     filter = {},
 }: _DeleteMany) => {
-    const url = `${generateDataApiUrl(appId)}/action/deleteMany`;
     const requestPayload = {
         collection: collectionName,
         database: databaseName,
@@ -18,7 +16,7 @@ const deleteMany = async ({
         filter,
     };
     try {
-        const response = await fetch(url, {
+        const response = await fetch(appHost, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

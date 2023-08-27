@@ -1,16 +1,14 @@
 import { InitCollection, InsertOne } from '../types';
-import { generateDataApiUrl } from '../utilities';
 
 interface _InsertOne extends InitCollection, InsertOne {}
 const insertOne = async ({
-    appId,
+    appHost,
     apiKey,
     databaseName,
     dataSource = 'Cluster0',
     collectionName,
     document = {},
 }: _InsertOne) => {
-    const url = `${generateDataApiUrl(appId)}/action/insertOne`;
     const requestPayload = {
         collection: collectionName,
         database: databaseName,
@@ -18,7 +16,7 @@ const insertOne = async ({
         document,
     };
     try {
-        const response = await fetch(url, {
+        const response = await fetch(appHost, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

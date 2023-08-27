@@ -2,12 +2,12 @@ import { initDatabase } from '../index';
 
 it('find', async () => {
     const db = initDatabase({
-        appId: process.env.appId || '',
+        appHost: process.env.appHost || '',
         apiKey: process.env.apiKey || '',
         databaseName: process.env.databaseName || '',
     });
 
-    const result = await db.collection('articles').find({
+    const result = await db.collection('user').find({
         filter: {
             $or: [{ creator: 'Patrick Chiu' }, { categories: { $in: ['javascript'] } }],
         },

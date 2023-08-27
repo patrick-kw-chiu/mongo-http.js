@@ -1,9 +1,8 @@
 import { InitCollection, UpdateMany } from '../types';
-import { generateDataApiUrl } from '../utilities';
 
 interface _UpdateMany extends InitCollection, UpdateMany {}
 const updateMany = async ({
-    appId,
+    appHost,
     apiKey,
     databaseName,
     dataSource = 'Cluster0',
@@ -12,7 +11,6 @@ const updateMany = async ({
     update = {},
     upsert = false,
 }: _UpdateMany) => {
-    const url = `${generateDataApiUrl(appId)}/action/updateMany`;
     const requestPayload = {
         collection: collectionName,
         database: databaseName,
@@ -22,7 +20,7 @@ const updateMany = async ({
         upsert,
     };
     try {
-        const response = await fetch(url, {
+        const response = await fetch(appHost, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

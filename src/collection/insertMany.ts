@@ -1,16 +1,14 @@
 import { InitCollection, InsertMany } from '../types';
-import { generateDataApiUrl } from '../utilities';
 
 interface _InsertMany extends InitCollection, InsertMany {}
 const insertMany = async ({
-    appId,
+    appHost,
     apiKey,
     databaseName,
     dataSource = 'Cluster0',
     collectionName,
     documents = [],
 }: _InsertMany) => {
-    const url = `${generateDataApiUrl(appId)}/action/insertMany`;
     const requestPayload = {
         collection: collectionName,
         database: databaseName,
@@ -18,7 +16,7 @@ const insertMany = async ({
         documents,
     };
     try {
-        const response = await fetch(url, {
+        const response = await fetch(appHost, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

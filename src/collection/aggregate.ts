@@ -1,16 +1,14 @@
 import { InitCollection, Aggregate } from '../types';
-import { generateDataApiUrl } from '../utilities';
 
 interface _Aggregate extends InitCollection, Aggregate {}
 const aggregate = async ({
-    appId,
+    appHost,
     apiKey,
     databaseName,
     dataSource = 'Cluster0',
     collectionName,
     pipeline = [],
 }: _Aggregate) => {
-    const url = `${generateDataApiUrl(appId)}/action/aggregate`;
     const requestPayload = {
         collection: collectionName,
         database: databaseName,
@@ -18,7 +16,7 @@ const aggregate = async ({
         pipeline,
     };
     try {
-        const response = await fetch(url, {
+        const response = await fetch(appHost, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -1,9 +1,8 @@
 import { InitCollection, UpdateOne } from '../types';
-import { generateDataApiUrl } from '../utilities';
 
 interface _UpdateOne extends InitCollection, UpdateOne {}
 const updateOne = async ({
-    appId,
+    appHost,
     apiKey,
     databaseName,
     dataSource = 'Cluster0',
@@ -12,7 +11,6 @@ const updateOne = async ({
     update = {},
     upsert = false,
 }: _UpdateOne) => {
-    const url = `${generateDataApiUrl(appId)}/action/updateOne`;
     const requestPayload = {
         collection: collectionName,
         database: databaseName,
@@ -22,7 +20,7 @@ const updateOne = async ({
         upsert,
     };
     try {
-        const response = await fetch(url, {
+        const response = await fetch(appHost, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -15,7 +15,7 @@ describe('findOne', () => {
 
     it('initClient', async () => {
         const client = initClient({
-            appId: process.env.appId || '',
+            appHost: process.env.appHost || '',
             apiKey: process.env.apiKey || '',
         });
 
@@ -41,7 +41,7 @@ describe('findOne', () => {
 
     it('initDatabase', async () => {
         const db = initDatabase({
-            appId: process.env.appId || '',
+            appHost: process.env.appHost || '',
             apiKey: process.env.apiKey || '',
             databaseName: process.env.databaseName || '',
         });
@@ -64,7 +64,7 @@ describe('findOne', () => {
 
     it('initCollection', async () => {
         const articlesCollection = initCollection({
-            appId: process.env.appId || '',
+            appHost: process.env.appHost || '',
             apiKey: process.env.apiKey || '',
             databaseName: process.env.databaseName || '',
             collectionName: 'articles',
@@ -88,7 +88,7 @@ describe('findOne', () => {
 
     it('incorrect connection information', async () => {
         const articlesCollection = initCollection({
-            appId: 'incorrect',
+            appHost: 'incorrect',
             apiKey: process.env.apiKey || '',
             databaseName: process.env.databaseName || '',
             collectionName: 'articles',
@@ -105,7 +105,7 @@ describe('findOne', () => {
 
     it('incorrect connection information 2', async () => {
         const articlesCollection = initCollection({
-            appId: process.env.appId || '',
+            appHost: process.env.appHost || '',
             apiKey: 'incorrect',
             databaseName: process.env.databaseName || '',
             collectionName: 'articles',
