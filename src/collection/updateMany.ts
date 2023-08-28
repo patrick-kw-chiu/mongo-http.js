@@ -1,8 +1,10 @@
 import { InitCollection, UpdateMany } from '../types';
+import { getDataApiHost, handleErrorResponse } from '../utilities';
 
 interface _UpdateMany extends InitCollection, UpdateMany {}
 const updateMany = async ({
-    appHost,
+    appId,
+    appRegion,
     apiKey,
     databaseName,
     dataSource = 'Cluster0',
@@ -11,6 +13,12 @@ const updateMany = async ({
     update = {},
     upsert = false,
 }: _UpdateMany) => {
+    const { dataApiHost, isSuccess, error } = getDataApiHost(appId, appRegion);
+    if (!isSuccess) {
+        return { error, isSuccess: false };
+    }
+
+    const url = `${dataApiHost}/action/updateMany`;
     const requestPayload = {
         collection: collectionName,
         database: databaseName,
@@ -20,7 +28,7 @@ const updateMany = async ({
         upsert,
     };
     try {
-        const response = await fetch(appHost, {
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -30,7 +38,7 @@ const updateMany = async ({
         });
         const responseBody = await response.json();
         if (responseBody.error) {
-            return { error: responseBody.error, isSuccess: false };
+            return handleErrorResponse(responseBody.error);
         }
         return { ...responseBody, error: null, isSuccess: true };
     } catch (error) {

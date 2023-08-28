@@ -1,14 +1,22 @@
 import { InitCollection, DeleteOne } from '../types';
+import { getDataApiHost, handleErrorResponse } from '../utilities';
 
 interface _DeleteOne extends InitCollection, DeleteOne {}
 const deleteOne = async ({
-    appHost,
+    appId,
+    appRegion,
     apiKey,
     databaseName,
     dataSource = 'Cluster0',
     collectionName,
     filter = {},
 }: _DeleteOne) => {
+    const { dataApiHost, isSuccess, error } = getDataApiHost(appId, appRegion);
+    if (!isSuccess) {
+        return { error, isSuccess: false };
+    }
+
+    const url = `${dataApiHost}/action/deleteOne`;
     const requestPayload = {
         collection: collectionName,
         database: databaseName,
@@ -16,7 +24,7 @@ const deleteOne = async ({
         filter,
     };
     try {
-        const response = await fetch(appHost, {
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -26,7 +34,7 @@ const deleteOne = async ({
         });
         const responseBody = await response.json();
         if (responseBody.error) {
-            return { error: responseBody.error, isSuccess: false };
+            return handleErrorResponse(responseBody.error);
         }
         return { ...responseBody, error: null, isSuccess: true };
     } catch (error) {

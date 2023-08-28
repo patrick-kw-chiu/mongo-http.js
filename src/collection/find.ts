@@ -1,8 +1,10 @@
 import { InitCollection, Find } from '../types';
+import { getDataApiHost, handleErrorResponse } from '../utilities';
 
 interface _Find extends InitCollection, Find {}
 const find = async ({
-    appHost,
+    appId,
+    appRegion,
     apiKey,
     databaseName,
     dataSource = 'Cluster0',
@@ -13,6 +15,12 @@ const find = async ({
     limit = 1000,
     skip = 0,
 }: _Find) => {
+    const { dataApiHost, isSuccess, error } = getDataApiHost(appId, appRegion);
+    if (!isSuccess) {
+        return { error, isSuccess: false };
+    }
+
+    const url = `${dataApiHost}/action/find`;
     const requestPayload = {
         collection: collectionName,
         database: databaseName,
@@ -24,7 +32,7 @@ const find = async ({
         skip,
     };
     try {
-        const response = await fetch(appHost, {
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -34,7 +42,7 @@ const find = async ({
         });
         const responseBody = await response.json();
         if (responseBody.error) {
-            return { error: responseBody.error, isSuccess: false };
+            return handleErrorResponse(responseBody.error);
         }
         return { ...responseBody, error: null, isSuccess: true };
     } catch (error) {

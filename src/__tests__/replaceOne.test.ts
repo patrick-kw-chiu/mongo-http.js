@@ -3,7 +3,7 @@ import { initDatabase } from '../index';
 describe('replaceOne', () => {
     it('initDatabase', async () => {
         const db = initDatabase({
-            appHost: process.env.analyticsAppId || '',
+            appId: process.env.analyticsAppId || '',
             apiKey: process.env.analyticsApiKey || '',
             databaseName: process.env.analyticsDatabaseName || '',
         });

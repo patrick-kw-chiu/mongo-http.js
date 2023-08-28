@@ -1,6 +1,6 @@
 {
     "name": "mongo-http",
-    "version": "0.0.19",
+    "version": "0.0.20",
     "description": "A thin wrapper on Mongodb Atlas Data API using native fetch API",
     "main": "./lib/index.js",
     "scripts": {

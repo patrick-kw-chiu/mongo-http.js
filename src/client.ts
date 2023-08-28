@@ -2,10 +2,11 @@ import { InitClient, Database } from './types';
 
 import initDatabase from './database';
 
-const initClient = ({ appHost, apiKey }: InitClient) => {
+const initClient = ({ appId, appRegion, apiKey }: InitClient) => {
     const database = ({ databaseName, dataSource }: Database) => {
         return initDatabase({
-            appHost,
+            appId,
+            appRegion,
             apiKey,
             databaseName,
             dataSource,

@@ -22,8 +22,8 @@ import deleteOne from './deleteOne';
 import deleteMany from './deleteMany';
 import aggregate from './aggregate';
 
-const initCollection = ({ appHost, apiKey, databaseName, dataSource, collectionName }: InitCollection) => {
-    const collectionConfig = { appHost, apiKey, databaseName, dataSource, collectionName };
+const initCollection = ({ appId, appRegion, apiKey, databaseName, dataSource, collectionName }: InitCollection) => {
+    const collectionConfig = { appId, appRegion, apiKey, databaseName, dataSource, collectionName };
     const collection = {
         findOne: async ({ filter, projection }: FindOne) =>
             await findOne({

@@ -3,7 +3,8 @@ import { Filter, Projection, UpdateFilter } from './mongo_types';
 
 import { Sort } from './sort';
 export interface InitClient {
-    appHost: string;
+    appId: string;
+    appRegion?: string;
     apiKey: string;
 }
 
