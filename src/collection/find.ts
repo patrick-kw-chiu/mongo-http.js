@@ -1,9 +1,8 @@
 import { InitCollection, Find } from '../types';
-import { generateDataApiUrl } from '../utilities';
 
 interface _Find extends InitCollection, Find {}
 const find = async ({
-    appId,
+    appHost,
     apiKey,
     databaseName,
     dataSource = 'Cluster0',
@@ -14,7 +13,6 @@ const find = async ({
     limit = 1000,
     skip = 0,
 }: _Find) => {
-    const url = `${generateDataApiUrl(appId)}/action/find`;
     const requestPayload = {
         collection: collectionName,
         database: databaseName,
@@ -26,7 +24,7 @@ const find = async ({
         skip,
     };
     try {
-        const response = await fetch(url, {
+        const response = await fetch(appHost, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

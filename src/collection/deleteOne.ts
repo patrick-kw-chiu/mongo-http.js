@@ -1,16 +1,14 @@
 import { InitCollection, DeleteOne } from '../types';
-import { generateDataApiUrl } from '../utilities';
 
 interface _DeleteOne extends InitCollection, DeleteOne {}
 const deleteOne = async ({
-    appId,
+    appHost,
     apiKey,
     databaseName,
     dataSource = 'Cluster0',
     collectionName,
     filter = {},
 }: _DeleteOne) => {
-    const url = `${generateDataApiUrl(appId)}/action/deleteOne`;
     const requestPayload = {
         collection: collectionName,
         database: databaseName,
@@ -18,7 +16,7 @@ const deleteOne = async ({
         filter,
     };
     try {
-        const response = await fetch(url, {
+        const response = await fetch(appHost, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -1,9 +1,8 @@
 import { InitCollection, ReplaceOne } from '../types';
-import { generateDataApiUrl } from '../utilities';
 
 interface _ReplaceOne extends InitCollection, ReplaceOne {}
 const replaceOne = async ({
-    appId,
+    appHost,
     apiKey,
     databaseName,
     dataSource = 'Cluster0',
@@ -12,7 +11,6 @@ const replaceOne = async ({
     replacement = {},
     upsert = false,
 }: _ReplaceOne) => {
-    const url = `${generateDataApiUrl(appId)}/action/replaceOne`;
     const requestPayload = {
         collection: collectionName,
         database: databaseName,
@@ -22,7 +20,7 @@ const replaceOne = async ({
         upsert,
     };
     try {
-        const response = await fetch(url, {
+        const response = await fetch(appHost, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

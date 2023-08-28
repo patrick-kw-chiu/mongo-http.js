@@ -1,9 +1,7 @@
 import { InitCollection, FindOne } from '../types';
-import { generateDataApiUrl } from '../utilities';
-
 interface _FindOne extends InitCollection, FindOne {}
 const findOne = async ({
-    appId,
+    appHost,
     apiKey,
     databaseName,
     dataSource = 'Cluster0',
@@ -11,7 +9,6 @@ const findOne = async ({
     filter = {},
     projection = {},
 }: _FindOne) => {
-    const url = `${generateDataApiUrl(appId)}/action/findOne`;
     const requestPayload = {
         collection: collectionName,
         database: databaseName,
@@ -20,7 +17,7 @@ const findOne = async ({
         projection,
     };
     try {
-        const response = await fetch(url, {
+        const response = await fetch(appHost, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

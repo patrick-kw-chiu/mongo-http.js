@@ -2,7 +2,7 @@ import { initDatabase } from '../index';
 
 it('find', async () => {
     const db = initDatabase({
-        appId: process.env.mainAppId || '',
+        appHost: process.env.mainappHost || '',
         apiKey: process.env.mainApiKey || '',
         databaseName: process.env.mainDatabaseName || '',
     });
