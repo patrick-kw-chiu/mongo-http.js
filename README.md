@@ -2,13 +2,41 @@
 
 ## About
 
-![mongo-http.js flow](https://github.com/patrick-kw-chiu/mongo-http.js/blob/main/assets/flow.png?raw=true)
+<p align="center">
+    <img width="200" alt="mongo-http.js icon" src="https://github.com/patrick-kw-chiu/mongo-http.js/assets/42149082/e46c0335-2a7c-413a-a740-5749db78f479">
+</p>
 
 A thin wrapper on [Mongodb Atlas Data API](https://www.mongodb.com/docs/atlas/api/data-api/) using native [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) API. This library serves the usecase where
 
 -   TCP connections over Mongodb Atlas is not possible (e.g. Serverless runtime like Cloudflare Workers), while still wanting to use similar MongoDB driver syntax.
--   It can also be used in serverless runtimes which the reuse of a MongoDB connection [may not always be available](https://www.mongodb.com/developer/languages/javascript/developing-web-application-netlify-serverless-functions-mongodb/#conclusion) or [require manual caching](https://www.mongodb.com/developer/languages/javascript/integrate-mongodb-vercel-functions-serverless-experience/#conclusion)
--   Sadly, it cannot be used in the browser side yet, due to [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS). Here is a [thread](https://feedback.mongodb.com/forums/945334-atlas-app-services/suggestions/44666878-please-support-cors-from-the-data-api) to request the CORS feature
+-   It can also be used in **serverless** runtimes which the **reuse of a MongoDB connection [may not always be available](https://www.mongodb.com/developer/languages/javascript/developing-web-application-netlify-serverless-functions-mongodb/#conclusion) or [require manual caching](https://www.mongodb.com/developer/languages/javascript/integrate-mongodb-vercel-functions-serverless-experience/#conclusion)**
+
+<p align="center">    
+    <img width="600" alt="mongo-http.js flow" src="https://github.com/patrick-kw-chiu/mongo-http.js/blob/main/assets/flow.png?raw=true">
+</p>
+
+## Quick example
+
+```javascript
+import { initDatabase } from 'mongo-http';
+
+const db = initDatabase({
+    appId: process.env.appId,
+    apiKey: process.env.apiKey,
+    appRegion: process.env.appRegion,
+    databaseName: process.env.databaseName,
+});
+
+const { isSuccess, documents, error } = await db.collection('articles').find({
+    filter: {
+        $or: [{ categories: { $in: ['javascript', 'nodejs'] } }],
+    },
+    projection: { title: 1, creator: 1, guid: 1, categories: 1 },
+    sort: { createdAt: -1 },
+    limit: 50,
+    skip: 100,
+});
+```
 
 ## Table of Contents
 
